@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ModelMasterBrand extends Model
+class ModelDaftarOrder extends Model
 {
-    protected $table = 'masterBrand';
+    protected $table = 'daftarOrders';
     protected $primaryKey = 'id';
 }

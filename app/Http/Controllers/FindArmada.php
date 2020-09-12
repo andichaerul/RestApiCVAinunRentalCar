@@ -2,39 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\ModelDaftarOrder;
 use DateTime;
 use DatePeriod;
 use DateInterval;
-use App\ModelOrders;
-use App\ModelDaftarArmada;
+use App\ModelGaleriUnit;
+use App\ModelMasterUnit;
 
 class FindArmada extends Controller
 {
     public function Index($tglStart, $tglFinish)
     {
-        $idArmadaReady = $this->_findArmadaReady($tglStart, $tglFinish);
+        $data = ModelMasterUnit::all();
+
+        $i = 0;
         $return = [];
-        for ($i = 0; $i < count($idArmadaReady); $i++) {
-            $detailArmada = ModelDaftarArmada::find($idArmadaReady[$i]);
-            foreach ($detailArmada->gambarArmada as $urlGambar) {
-                $urlGambarArr[$detailArmada->id][] = $urlGambar->url;
+        foreach ($data as $row) {
+            $unitIsReady = $this->_cekKetersediaanUnit($row->id, $tglStart, $tglFinish);
+            if ($unitIsReady == "unitTersedia") {
+                $return[$i]['harga'] = $row->biayaSewaPerHari;
+                $return[$i]['namaMitra'] = $row->mitra->namaMitra;
+                $return[$i]['unitBrand'] = $row->brand->namaBrand;
+                $return[$i]['namaUnit'] = $row->varian;
+                $return[$i]['typeVarian'] = $row->typeOrClass;
+                $return[$i]['warna'] = $row->warna->namaWarna;
+                $return[$i]['isMatic'] = $row->isMatic;
+                $return[$i]['tahunKendaraan'] = $row->tahun;
+                $return[$i]['isIncludeDriver'] = $row->includeDriver;
+                $galeriUnit = ModelGaleriUnit::where('idUnit', '=', $row->id);
+                $iUrlGambar = 0;
+                foreach ($galeriUnit->get() as $rowUrlGambar) {
+                    $return[$i]['urlGambar'][$iUrlGambar] = $rowUrlGambar->urlGambar;
+                    $iUrlGambar++;
+                }
+                $i++;
             }
-            $return[] = array(
-                'namaMitra' => (empty($detailArmada->mitra)) ? null : $detailArmada->mitra->nama_mitra,
-                'unitBrand' => (empty($detailArmada->varian)) ? null : $detailArmada->varian->brand->namaBrand,
-                'namaUnit' => (empty($detailArmada->varian)) ? null : $detailArmada->varian->namaVarian,
-                'typeVarian' => (empty($detailArmada->varian)) ? null : $detailArmada->varian->typeUnit,
-                'warna' => (empty($detailArmada->varian)) ? null : $detailArmada->varian->warna,
-                'isMatic' => (empty($detailArmada->varian)) ? null : $detailArmada->varian->isMatic,
-                'tahunKendaraan' => (empty($row)) ? null : $detailArmada->tahunArmada,
-                'isIncludeDriver' => (empty($row)) ? null : $detailArmada->isIncludeDriver,
-                'urlGambar' => $urlGambarArr[$detailArmada->id]
-            );
         }
+
         return $return;
     }
 
-    public function _tglPemakaian($tglStart, $tglFinish)
+    public function _getTanggalSewa($tglStart, $tglFinish)
     {
         $begin = new DateTime($tglStart);
         $end = new DateTime($tglFinish);
@@ -42,46 +50,32 @@ class FindArmada extends Controller
         $interval = new DateInterval('P1D');
         $daterange = new DatePeriod($begin, $interval, $end);
         foreach ($daterange as $date) {
-            $test[] = $date->format("Y-m-d");
+            $dateArr[] = $date->format("Y-m-d");
         }
-        if (empty($test)) {
-            $error = array(
-                'status' => 'error',
-            );
-            die(json_encode($error));
-        } else {
-            return $test;
+        if (empty($dateArr)) {
+            $data['status'] = "error";
+            die(json_encode($data));
         }
+        return $dateArr;
     }
 
-    public function _findArmadaReady($tglStart, $tglFinish)
+    public function _cekKetersediaanUnit($idUnit, $tglStart, $tglFinish)
     {
-        $idArmadaReady = [];
-        $data = ModelOrders::all();
-        $tglPemakaian = $this->_tglPemakaian($tglStart, $tglFinish);
-        foreach ($data as $row) {
-            $id = $row->id;
-            $begin = new DateTime($row->dariTanggal);
-            $end = new DateTime($row->sampaiTanggal);
-            $end = $end->modify('+1 day');
-
-            $interval = new DateInterval('P1D');
-            $daterange = new DatePeriod($begin, $interval, $end);
-            foreach ($daterange as $date) {
-                $test[$id][] = $date->format("Y-m-d");
-            }
-            for ($i = 0; $i < count($tglPemakaian); $i++) {
-                $dede[$i] = array_search($tglPemakaian[$i], $test[$id]);
-                if (array_search($tglPemakaian[$i], $test[$id]) === false) {
-                    null;
-                } else {
-                    $tidakTersedia[$id] = $id;
+        $tanggalSewaCustomer = $this->_getTanggalSewa($tglStart, $tglFinish);
+        $order = ModelDaftarOrder::where('idUnit', '=', $idUnit);
+        if ($order->count() > 0) {
+            foreach ($order->get() as $row) {
+                $customer = $tanggalSewaCustomer;
+                $unit = $this->_getTanggalSewa($row->dariTanggal, $row->sampaiTanggal);
+                for ($i = 0; $i < count($customer); $i++) {
+                    if (array_search($customer[$i], $unit) !== false) {
+                        return "unitTidakTersedia";
+                    }
                 }
+                return "unitTersedia";
             }
-            if (empty($tidakTersedia[$id])) {
-                $idArmadaReady[] = $id;
-            }
+        } else {
+            return "unitTersedia";
         }
-        return $idArmadaReady;
     }
 }

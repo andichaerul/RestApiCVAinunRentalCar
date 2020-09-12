@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelMasterMitra extends Model
 {
-    protected $table = "masterMitra";
-    protected $primaryKey = "id";
-
-
+    protected $table = 'masterMitra';
+    protected $primaryKey = 'id';
 }
