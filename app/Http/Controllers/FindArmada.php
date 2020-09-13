@@ -6,7 +6,6 @@ use App\ModelDaftarOrder;
 use DateTime;
 use DatePeriod;
 use DateInterval;
-use App\ModelGaleriUnit;
 use App\ModelMasterUnit;
 
 class FindArmada extends Controller
@@ -20,8 +19,10 @@ class FindArmada extends Controller
         foreach ($data as $row) {
             $unitIsReady = $this->_cekKetersediaanUnit($row->id, $tglStart, $tglFinish);
             if ($unitIsReady == "unitTersedia") {
-                $return[$i]['harga'] = $row->biayaSewaPerHari;
+                $return[$i]['harga'] = "Rp. " . number_format($row->biayaSewaPerHari, 0, ',', '.');
+                $return[$i]['namaUnitLengkap'] = $row->brand->namaBrand . " " . $row->varian . " " . $row->typeOrClass . " " . $row->tahun;
                 $return[$i]['namaMitra'] = $row->mitra->namaMitra;
+                $return[$i]['alamatMitra'] = $row->mitra->alamatMitra;
                 $return[$i]['unitBrand'] = $row->brand->namaBrand;
                 $return[$i]['namaUnit'] = $row->varian;
                 $return[$i]['typeVarian'] = $row->typeOrClass;
@@ -29,12 +30,8 @@ class FindArmada extends Controller
                 $return[$i]['isMatic'] = $row->isMatic;
                 $return[$i]['tahunKendaraan'] = $row->tahun;
                 $return[$i]['isIncludeDriver'] = $row->includeDriver;
-                $galeriUnit = ModelGaleriUnit::where('idUnit', '=', $row->id);
-                $iUrlGambar = 0;
-                foreach ($galeriUnit->get() as $rowUrlGambar) {
-                    $return[$i]['urlGambar'][$iUrlGambar] = $rowUrlGambar->urlGambar;
-                    $iUrlGambar++;
-                }
+                $return[$i]['urlGambar'] = $row->gambar->first()['urlGambar'];
+
                 $i++;
             }
         }

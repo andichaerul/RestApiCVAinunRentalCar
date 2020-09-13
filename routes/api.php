@@ -1,5 +1,5 @@
 <?php
-http://localhost/ainun-rent/api/
+// http://localhost/ainun-rent/api/
 use Illuminate\Support\Facades\Route;
 
 Route::get('v1/offers', 'ApiOffers@Index');

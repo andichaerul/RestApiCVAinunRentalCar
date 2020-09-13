@@ -23,4 +23,9 @@ class ModelMasterUnit extends Model
     {
         return $this->hasOne(ModelMasterWarna::class, 'id', 'idWarna');
     }
+
+    public function gambar()
+    {
+        return $this->hasMany(ModelGaleriUnit::class, 'idUnit', 'id');
+    }
 }
