@@ -20,22 +20,35 @@ class FindArmada extends Controller
             $unitIsReady = $this->_cekKetersediaanUnit($row->id, $tglStart, $tglFinish);
             if ($unitIsReady == "unitTersedia") {
                 $return[$i]['harga'] = "Rp. " . number_format($row->biayaSewaPerHari, 0, ',', '.');
-                $return[$i]['namaUnitLengkap'] = $row->brand->namaBrand . " " . $row->varian . " " . $row->typeOrClass . " " . $row->tahun;
+                $return[$i]['namaUnitLengkap'] = $row->brand->namaBrand . " " . $row->varian->namaVarian . " " . $row->typeOrClass . " " . $row->tahun;
                 $return[$i]['namaMitra'] = $row->mitra->namaMitra;
                 $return[$i]['alamatMitra'] = $row->mitra->alamatMitra;
                 $return[$i]['unitBrand'] = $row->brand->namaBrand;
-                $return[$i]['namaUnit'] = $row->varian;
+                $return[$i]['namaUnit'] = $row->varian->namaVarian;
                 $return[$i]['typeVarian'] = $row->typeOrClass;
                 $return[$i]['warna'] = $row->warna->namaWarna;
                 $return[$i]['isMatic'] = $row->isMatic;
                 $return[$i]['tahunKendaraan'] = $row->tahun;
                 $return[$i]['isIncludeDriver'] = $row->includeDriver;
                 $return[$i]['urlGambar'] = $row->gambar->first()['urlGambar'];
-
                 $i++;
             }
         }
 
+        return $return;
+    }
+
+    public function OrderByVarian($tglStart, $tglFinish)
+    {
+        $data = $this->Index($tglStart, $tglFinish);
+        $arr = array();
+        foreach ($data as $key => $item) {
+            $arr[$item['namaUnit']][$key] = null;
+        }
+        $unit = array_keys($arr);
+        for ($i = 0; $i < count($unit); $i++) {
+            $return['unit'][$i] = $unit[$i];
+        }
         return $return;
     }
 

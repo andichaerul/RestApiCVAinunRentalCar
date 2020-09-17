@@ -28,4 +28,9 @@ class ModelMasterUnit extends Model
     {
         return $this->hasMany(ModelGaleriUnit::class, 'idUnit', 'id');
     }
+
+    public function varian()
+    {
+        return $this->hasOne(ModelMasterVarian::class, 'id', 'idVarian');
+    }
 }
