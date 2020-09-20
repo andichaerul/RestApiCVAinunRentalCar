@@ -24,4 +24,15 @@ class ApiOffers extends Controller
         }
         return $return;
     }
+
+    public function Detail($id)
+    {
+        $data = ModelOffersPromo::find($id);
+        $return = array(
+            'judulPromo' => $data->JudulPromo,
+            'deskripsiPromo' => $data->DeskripsiPromo,
+            'urlGambar' => $data->UrlGambar,
+        );
+        return $return;
+    }
 }
