@@ -10,9 +10,37 @@ use App\ModelMasterUnit;
 
 class FindArmada extends Controller
 {
-    public function Index($tglStart, $tglFinish)
+
+    public function _getQuery($tglStart, $tglFinish, $sort = null, $inListVarian = null, $inListLainnya = null)
     {
+        $inListVarian = explode('_', $inListVarian);
+        // if ($sort == 'hargaTertinggi') {
+        //     $data = ModelMasterUnit::all()
+        //         ->sortByDesc('biayaSewaPerHari')
+        //         ->whereIn('idVarian', $inListVarian);
+        // } else if ($sort == 'hargaTerendah') {
+        //     $data = ModelMasterUnit::all()
+        //         ->sortBy('biayaSewaPerHari');
+        // } else {
+        //     $data = ModelMasterUnit::all();
+        // }
+        // return $data;
+    }
+    public function Index($tglStart, $tglFinish, $sort = null, $inListVarian = null, $inListLainnya = null)
+    {
+        $inListVarianArr = explode('_', $inListVarian);
         $data = ModelMasterUnit::all();
+        switch ($sort) {
+            case 'hargaTertinggi':
+                $data = $data->sortByDesc('biayaSewaPerHari');
+                break;
+            case 'hargaTerendah':
+                $data = $data->sortBy('biayaSewaPerHari');
+                break;
+        }
+        if ($inListVarian !== "null") {
+            $data = $data->whereIn('idVarian', $inListVarianArr);
+        }
 
         $i = 0;
         $return = [];
@@ -46,10 +74,7 @@ class FindArmada extends Controller
             $arr[$item['namaUnit']][$key] = null;
         }
         $unit = array_keys($arr);
-        for ($i = 0; $i < count($unit); $i++) {
-            $return['unit'][$i] = $unit[$i];
-        }
-        return $return;
+        return $unit;
     }
 
     public function _getTanggalSewa($tglStart, $tglFinish)
