@@ -10,22 +10,6 @@ use App\ModelMasterUnit;
 
 class FindArmada extends Controller
 {
-
-    public function _getQuery($tglStart, $tglFinish, $sort = null, $inListVarian = null, $inListLainnya = null)
-    {
-        $inListVarian = explode('_', $inListVarian);
-        // if ($sort == 'hargaTertinggi') {
-        //     $data = ModelMasterUnit::all()
-        //         ->sortByDesc('biayaSewaPerHari')
-        //         ->whereIn('idVarian', $inListVarian);
-        // } else if ($sort == 'hargaTerendah') {
-        //     $data = ModelMasterUnit::all()
-        //         ->sortBy('biayaSewaPerHari');
-        // } else {
-        //     $data = ModelMasterUnit::all();
-        // }
-        // return $data;
-    }
     public function Index($tglStart, $tglFinish, $sort = null, $inListVarian = null, $inListLainnya = null)
     {
         $inListVarianArr = explode('_', $inListVarian);
@@ -39,7 +23,9 @@ class FindArmada extends Controller
                 break;
         }
         if ($inListVarian !== "null") {
-            $data = $data->whereIn('idVarian', $inListVarianArr);
+            if ($inListVarian !== null) {
+                $data = $data->whereIn('idVarian', $inListVarianArr);
+            }
         }
 
         $i = 0;
@@ -62,11 +48,9 @@ class FindArmada extends Controller
                 $i++;
             }
         }
-
         return $return;
     }
-
-    public function OrderByVarian($tglStart, $tglFinish)
+    public function GroupByVarian($tglStart, $tglFinish)
     {
         $data = $this->Index($tglStart, $tglFinish);
         $arr = array();
