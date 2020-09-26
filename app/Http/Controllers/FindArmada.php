@@ -39,6 +39,7 @@ class FindArmada extends Controller
                 $return[$i]['alamatMitra'] = $row->mitra->alamatMitra;
                 $return[$i]['unitBrand'] = $row->brand->namaBrand;
                 $return[$i]['namaUnit'] = $row->varian->namaVarian;
+                $return[$i]['idVarian'] = $row->varian->id;
                 $return[$i]['typeVarian'] = $row->typeOrClass;
                 $return[$i]['warna'] = $row->warna->namaWarna;
                 $return[$i]['isMatic'] = $row->isMatic;
