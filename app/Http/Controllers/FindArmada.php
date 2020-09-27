@@ -108,4 +108,25 @@ class FindArmada extends Controller
             return "unitTersedia";
         }
     }
+
+    public function Detail($id)
+    {
+        $data = ModelMasterUnit::find($id);
+        $return[0]['idMobil'] = $data->id;;
+        $return[0]['harga'] = "Rp. " . number_format($data->biayaSewaPerHari, 0, ',', '.');;
+        $return[0]['namaUnitLengkap'] = $data->brand->namaBrand . " " . $data->varian->namaVarian . " " . $data->typeOrClass . " " . $data->tahun;;
+        $return[0]['namaMitra'] = $data->mitra->namaMitra;;
+        $return[0]['alamatMitra'] = $data->mitra->alamatMitra;;
+        $return[0]['unitBrand'] = $data->brand->namaBrand;;
+        $return[0]['namaUnit'] = $data->varian->namaVarian;;
+        $return[0]['idVarian'] = $data->varian->id;;
+        $return[0]['typeVarian'] = $data->typeOrClass;;
+        $return[0]['warna'] = $data->warna->namaWarna;;
+        $return[0]['isMatic'] = $data->isMatic;;
+        $return[0]['tahunKendaraan'] = $data->tahun;;
+        $return[0]['isIncludeDriver'] = $data->includeDriver;;
+        $return[0]['urlGambar'] = $data->gambar->first()['urlGambar'];;
+
+        return $return;
+    }
 }
