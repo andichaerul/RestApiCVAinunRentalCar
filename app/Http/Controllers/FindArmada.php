@@ -33,6 +33,7 @@ class FindArmada extends Controller
         foreach ($data as $row) {
             $unitIsReady = $this->_cekKetersediaanUnit($row->id, $tglStart, $tglFinish);
             if ($unitIsReady == "unitTersedia") {
+                $return[$i]['idMobil'] = $row->id;
                 $return[$i]['harga'] = "Rp. " . number_format($row->biayaSewaPerHari, 0, ',', '.');
                 $return[$i]['namaUnitLengkap'] = $row->brand->namaBrand . " " . $row->varian->namaVarian . " " . $row->typeOrClass . " " . $row->tahun;
                 $return[$i]['namaMitra'] = $row->mitra->namaMitra;
@@ -56,10 +57,19 @@ class FindArmada extends Controller
         $data = $this->Index($tglStart, $tglFinish);
         $arr = array();
         foreach ($data as $key => $item) {
-            $arr[$item['namaUnit']][$key] = null;
+            $namaUnit[$item['namaUnit']][$key] = null;
+            $idVarian[$item['idVarian']] = null;
         }
-        $unit = array_keys($arr);
-        return $unit;
+
+        $namaUnitArr = array_keys($namaUnit);
+        $idVarianArr = array_keys($idVarian);
+        for ($i = 0; $i < count($namaUnitArr); $i++) {
+            $result[$i] = array(
+                'nama' => $namaUnitArr[$i],
+                'id' => $idVarianArr[$i],
+            );
+        }
+        return $result;
     }
 
     public function _getTanggalSewa($tglStart, $tglFinish)
